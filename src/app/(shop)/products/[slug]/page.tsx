@@ -7,6 +7,14 @@ import { notFound } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { AddToCartButton } from '@/components/features/cart/AddToCartButton';
 
+// --- Interface untuk props halaman ---
+interface PageProps {
+  params: {
+    slug: string;
+  };
+}
+
+// --- Ambil data produk dari Supabase berdasarkan slug ---
 async function getProduct(id: string) {
   const supabase = createClient();
   const { data, error } = await supabase
@@ -21,7 +29,8 @@ async function getProduct(id: string) {
   return data;
 }
 
-export default async function ProductDetailPage({ params }: { params: { slug: string } }) {
+// --- Komponen Halaman Detail Produk ---
+export default async function ProductDetailPage({ params }: PageProps) {
   const product: Product = await getProduct(params.slug);
 
   return (
