@@ -6,14 +6,7 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { AddToCartButton } from '@/components/features/cart/AddToCartButton';
 
-// --- Tipe Props Halaman Dinamis ---
-export interface PageProps {
-  params: {
-    slug: string;
-  };
-}
-
-// --- Ambil data produk dari Supabase berdasarkan slug ---
+// --- Ambil Detail Produk dari Supabase ---
 async function getProduct(id: string): Promise<Product> {
   const supabase = createClient();
   const { data, error } = await supabase
@@ -32,7 +25,9 @@ async function getProduct(id: string): Promise<Product> {
 // --- Halaman Detail Produk ---
 export default async function ProductDetailPage({
   params,
-}: PageProps): Promise<JSX.Element> {
+}: {
+  params: { slug: string };
+}): Promise<JSX.Element> {
   const product = await getProduct(params.slug);
 
   return (
