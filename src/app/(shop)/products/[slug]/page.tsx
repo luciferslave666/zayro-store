@@ -4,18 +4,17 @@ import { createClient } from '@/lib/supabase/server';
 import { Product } from '@/types';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { Button } from '@/components/ui/button';
 import { AddToCartButton } from '@/components/features/cart/AddToCartButton';
 
-// --- Interface untuk props halaman ---
-interface PageProps {
+// --- Tipe Props Halaman Dinamis ---
+export interface PageProps {
   params: {
     slug: string;
   };
 }
 
 // --- Ambil data produk dari Supabase berdasarkan slug ---
-async function getProduct(id: string) {
+async function getProduct(id: string): Promise<Product> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from('products')
@@ -26,17 +25,20 @@ async function getProduct(id: string) {
   if (error || !data) {
     notFound();
   }
+
   return data;
 }
 
-// --- Komponen Halaman Detail Produk ---
-export default async function ProductDetailPage({ params }: PageProps) {
-  const product: Product = await getProduct(params.slug);
+// --- Halaman Detail Produk ---
+export default async function ProductDetailPage({
+  params,
+}: PageProps): Promise<JSX.Element> {
+  const product = await getProduct(params.slug);
 
   return (
     <div className="container mx-auto my-12 p-4">
       <div className="grid md:grid-cols-2 gap-12">
-        {/* Kolom Gambar */}
+        {/* Gambar Produk */}
         <div className="relative aspect-square">
           <Image
             src={product.image_url}
@@ -46,7 +48,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
           />
         </div>
 
-        {/* Kolom Detail Produk */}
+        {/* Detail Produk */}
         <div className="flex flex-col justify-center">
           <h1 className="text-4xl font-bold mb-4">{product.name}</h1>
           <p className="text-3xl font-semibold text-primary mb-6">
