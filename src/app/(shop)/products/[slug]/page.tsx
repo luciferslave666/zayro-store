@@ -1,50 +1,30 @@
 // File: src/app/(shop)/products/[slug]/page.tsx
 
-import { supabase } from '@/lib/supabaseClient';
+import { createClient } from '@/lib/supabase/server'; // <-- Gunakan client server yang benar
 import { Product } from '@/types';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { AddToCartButton } from '@/components/features/cart/AddToCartButton';
 
-// Mendefinisikan tipe untuk props yang diterima halaman ini
-interface ProductDetailPageProps {
-  params: {
-    slug: string; // 'slug' ini sesuai dengan nama folder dinamis: [slug]
-  };
-}
-
-// Fungsi untuk mengambil satu produk spesifik dari Supabase dengan debugging
-async function getProduct(id: string) {
-  // 1. Log saat fungsi dipanggil
-  console.log(`--- Mencoba mengambil produk dengan ID: ${id} ---`);
-
+// Fungsi untuk mengambil data diletakkan di luar komponen
+async function getProduct(id: string): Promise<Product> {
+  const supabase = createClient();
   const { data, error } = await supabase
     .from('products')
     .select('*')
-    .eq('id', id) // Mencari produk yang ID-nya cocok dengan yang ada di URL
-    .single();   // Mengharapkan hanya satu hasil
+    .eq('id', id)
+    .single();
 
-  // 2. Log jika ada error dari Supabase
-  if (error) {
-    console.error('ERROR DARI SUPABASE:', error.message);
-    notFound();
+  if (error || !data) {
+    notFound(); // Jika produk tidak ditemukan, tampilkan halaman 404
   }
-
-  // 3. Log jika data tidak ditemukan
-  if (!data) {
-    console.log(`HASIL: Data tidak ditemukan untuk ID: ${id}. Memicu notFound().`);
-    notFound();
-  }
-
-  // 4. Log jika data berhasil ditemukan
-  console.log('HASIL: Produk ditemukan:', data);
   return data;
 }
 
-// Komponen Halaman
-export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
-  const product: Product = await getProduct(params.slug);
+// Hanya ada SATU export default untuk komponen halaman
+export default async function ProductDetailPage({ params }: { params: { slug: string } }) {
+  const product = await getProduct(params.slug);
 
   return (
     <div className="container mx-auto my-12 p-4">
