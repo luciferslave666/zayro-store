@@ -2,7 +2,6 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
 import * as crypto from 'crypto';
 
 export async function createIpaymuPayment() {
@@ -74,7 +73,7 @@ export async function createIpaymuPayment() {
       console.error("iPaymu Error:", data.Message);
       return { error: data.Message || "Gagal membuat pembayaran." };
     }
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.error("Fetch Error:", e.message);
     return { error: "Gagal terhubung ke iPaymu." };
   }
