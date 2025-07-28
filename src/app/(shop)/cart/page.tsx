@@ -1,7 +1,6 @@
 // File: src/app/(shop)/cart/page.tsx
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { CartItem } from '@/components/features/cart/CartItem';
 import Link from 'next/link';
@@ -34,7 +33,7 @@ export default async function CartPage() {
   }
 
   const totalPrice = cartItems.reduce((total, item) => {
-    // @ts-ignore
+    // @ts-expect-error
     return total + (item.products.price * item.quantity);
   }, 0);
 
@@ -53,7 +52,7 @@ export default async function CartPage() {
           <div className="lg:col-span-2">
             <div className="space-y-4">
               {cartItems.map(item => (
-                // @ts-ignore
+                // @ts-expect-error
                 <CartItem key={item.id} item={item} />
               ))}
             </div>
