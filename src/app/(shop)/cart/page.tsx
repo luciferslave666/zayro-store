@@ -1,7 +1,6 @@
 // File: src/app/(shop)/cart/page.tsx
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { CartItem } from '@/components/features/cart/CartItem';
 import Link from 'next/link';
