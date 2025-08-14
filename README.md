@@ -27,6 +27,10 @@
 
 ---
 
+## 🌐 Live Demo
+[Klik di sini untuk membuka Zayro Store](https://zayro-store.vercel.app/)
+
+
 ## 📦 Cara Menjalankan Project
 
 1. Clone repository:
