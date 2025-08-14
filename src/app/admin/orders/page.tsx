@@ -8,12 +8,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from '@/components/ui/badge';
+import { OrderStatusSelector } from '@/components/features/orders/OrderStatusSelector';
 
 export default async function AdminOrdersPage() {
   const supabase = createClient();
-
-  // Ambil data pesanan dan gabungkan (join) dengan data email dari tabel profiles
+  
+  // Ambil data pesanan dan gabungkan dengan data dari tabel profiles
   const { data: orders, error } = await supabase
     .from('orders')
     .select(`
@@ -26,6 +26,11 @@ export default async function AdminOrdersPage() {
 
   if (error) {
     return <p className="text-red-500">Gagal memuat pesanan: {error.message}</p>;
+  }
+
+  // Jika query berhasil tetapi tidak ada pesanan
+  if (!orders) {
+    return <p className="text-muted-foreground">Tidak ada pesanan untuk ditampilkan.</p>;
   }
 
   return (
@@ -47,13 +52,11 @@ export default async function AdminOrdersPage() {
             {orders.map((order) => (
               <TableRow key={order.id}>
                 <TableCell className="font-mono text-xs">{order.reference_id}</TableCell>
-                {/* @ts-ignore */}
                 <TableCell>{order.profiles?.email || 'N/A'}</TableCell>
                 <TableCell>Rp{order.total_price.toLocaleString('id-ID')}</TableCell>
                 <TableCell>
-                  <Badge variant={order.status === 'success' ? 'default' : 'secondary'}>
-                    {order.status}
-                  </Badge>
+                  {/* GANTI <Badge> DENGAN KOMPONEN BARU INI */}
+                  <OrderStatusSelector orderId={order.id} currentStatus={order.status} />
                 </TableCell>
                 <TableCell>{new Date(order.created_at).toLocaleDateString('id-ID')}</TableCell>
               </TableRow>

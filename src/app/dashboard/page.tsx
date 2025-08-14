@@ -26,9 +26,10 @@ export default async function DashboardPage() {
 
   return (
     <div className="container mx-auto py-12 px-4">
-      <h1 className="text-3xl font-bold mb-8">Dasbor Anda</h1>
       <h2 className="text-xl font-semibold mb-4">Riwayat Pesanan</h2>
-
+                <Link href="/" className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary">
+            Kembali
+          </Link>
       {orders.length === 0 ? (
         <div className="text-center border-2 border-dashed rounded-lg p-12">
           <p className="text-muted-foreground mb-4">Anda belum memiliki pesanan.</p>

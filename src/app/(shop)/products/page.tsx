@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { Product } from '@/types';
 import { ProductCard } from '@/components/features/product/ProductCard';
+import { SearchBar } from '@/components/features/product/SearchBar';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 
@@ -13,26 +14,27 @@ interface ProductsPageProps {
   };
 }
 
-// Fungsi ini sekarang menerima parameter 'query' dan 'categoryId'
-async function getProducts({ query, categoryId }: { query: string; categoryId: string; }) {
+// Fungsi ini sekarang secara eksplisit akan mengembalikan Promise<Product[]>
+async function getProducts({ query, categoryId }: { query: string; categoryId: string; }): Promise<Product[]> {
   const supabase = createClient();
   
   if (categoryId) {
-    // Jika ada filter kategori, lakukan JOIN
     const { data, error } = await supabase
       .from('product_categories')
-      .select('products(*)') // Ambil semua data dari tabel products yang terhubung
+      .select('products(*)')
       .eq('category_id', categoryId)
-      .ilike('products.name', `%${query}%`); // Terapkan search di dalam JOIN
+      .ilike('products.name', `%${query}%`);
     
     if (error) {
       console.error("Error fetching products by category:", error.message);
       throw new Error(error.message);
     }
-    // Ubah struktur data agar sesuai
-    return data.map(item => item.products) as Product[];
+    
+    if (!data) return [];
+    // Cara yang lebih aman untuk memastikan tipe data
+    return data.flatMap(item => item.products).filter((p): p is Product => p !== null);
+
   } else {
-    // Jika tidak ada filter kategori, lakukan query biasa
     let queryBuilder = supabase
       .from('products')
       .select('*')
@@ -46,11 +48,10 @@ async function getProducts({ query, categoryId }: { query: string; categoryId: s
       console.error("Error fetching products:", error.message);
       throw new Error(error.message);
     }
-    return data;
+    return data || []; // Kembalikan array kosong jika data null
   }
 }
 
-// Fungsi untuk mengambil semua kategori
 async function getCategories() {
     const supabase = createClient();
     const { data, error } = await supabase.from('categories').select('*').order('name');
@@ -58,7 +59,7 @@ async function getCategories() {
         console.error("Error fetching categories:", error);
         return [];
     }
-    return data;
+    return data || [];
 }
 
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
@@ -66,22 +67,22 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   const categoryId = searchParams?.category || '';
   
   try {
-    const products: Product[] = await getProducts({ query, categoryId });
+    const products = await getProducts({ query, categoryId }); // Tidak perlu : Product[] lagi
     const categories = await getCategories();
 
     return (
       <main className="container mx-auto py-12 px-4">
         <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
           <h1 className="text-3xl font-bold">Semua Produk</h1>
+           <SearchBar /> {/* Pastikan SearchBar di-import dan diletakkan di sini */}
         </div>
         
-        {/* Tampilkan Filter Kategori di Sini */}
         <div className="flex flex-wrap items-center gap-2 mb-8">
             <Link href="/products">
                 <Badge variant={!categoryId ? 'default' : 'outline'}>Semua</Badge>
             </Link>
             {categories.map(category => (
-                <Link key={category.id} href={`/products?category=${category.id}`}>
+                <Link key={category.id} href={`/products?category=${category.id}&q=${query}`}>
                     <Badge variant={categoryId === String(category.id) ? 'default' : 'outline'}>
                         {category.name}
                     </Badge>

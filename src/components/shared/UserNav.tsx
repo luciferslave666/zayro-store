@@ -60,7 +60,7 @@ export function UserNav({ user, userRole }: UserNavProps) {
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link href={userRole === 'admin' ? '/admin' : '/dashboard'}>
-            Dasbor
+            Dashboard
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
