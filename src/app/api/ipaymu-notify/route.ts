@@ -44,13 +44,13 @@ export async function POST(request: Request) {
       try {
         await resend.emails.send({
           from: 'Zayro Store <onboarding@resend.dev>',
-          // @ts-ignore
+          // @ts-expect-error
           to: order.profiles.email,
           subject: `Konfirmasi Pesanan #${order.reference_id}`,
           react: OrderConfirmationEmail({
             referenceId: order.reference_id,
             totalPrice: order.total_price,
-            // @ts-ignore
+            // @ts-expect-error
             orderItems: order.order_items,
           }),
         });
