@@ -33,7 +33,7 @@ export default async function CartPage() {
   }
 
   const totalPrice = cartItems.reduce((total, item) => {
-    // @ts-ignore
+    // @ts-expect-error
     return total + (item.products.price * item.quantity);
   }, 0);
 
@@ -52,7 +52,7 @@ export default async function CartPage() {
           <div className="lg:col-span-2">
             <div className="space-y-4">
               {cartItems.map(item => (
-                // @ts-ignore
+                // @ts-expect-error
                 <CartItem key={item.id} item={item} />
               ))}
             </div>
